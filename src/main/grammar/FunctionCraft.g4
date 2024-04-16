@@ -76,11 +76,11 @@ lambda: ARROW {System.out.println("Structure: LAMBDA");} LP param1 RP LC RETURN 
 list: LB input RB | LB RB;
 
 func_call:
-      name = BUILT_IN_FUNCTIONS {System.out.println("Built-In: " + $name.text);} LP input RP
-    | ID {System.out.println("Function Call");} LP input RP
-    | ID {System.out.println("Function Call");} LP RP
+      name = BUILT_IN_FUNCTIONS {System.out.println("Built-In: " + $name.text.toUpperCase());} LP input RP
+    | ID {System.out.println("FunctionCall");} LP input RP
+    | ID {System.out.println("FunctionCall");} LP RP
     | METHOD LP CL ID RP
-    | ID DOT name = BUILT_IN {System.out.println("Built-In: " + $name.text);} LP input RP
+    | ID DOT name = BUILT_IN {System.out.println("Built-In: " + $name.text.toUpperCase());} LP input RP
     ;
 
 input: expr COM input
