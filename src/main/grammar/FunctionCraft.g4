@@ -7,8 +7,14 @@ grammar FunctionCraft;
 
 // TODO
 
-program: func* main;
+program: (func | ptrn)* main;
+
 func: DEF ID LP param RP func_body END;
+
+ptrn: PATTERN ID LP param1 RP patrn_line* SEMI;
+
+patrn_line: MID LP expr RP EQ expr;
+
 param:
     | param1
     | LB param_opt RB
@@ -27,14 +33,11 @@ main: DEF MAIN LP RP {System.out.println("MAIN");} func_body END;
 
 func_body: line* (RETURN expr? SEMI)?;
 
-line: assign
-    | expr SEMI
+line: expr SEMI
     | if
     | for
     | loop
     ;
-
-assign: ID ASS expr SEMI;
 
 if: IF condition line+ (ELSEIF condition line+)* (ELSE line+)? END;
 
@@ -52,7 +55,7 @@ forline: line
     | BREAK IF condition SEMI
     | NEXT IF condition SEMI;
 
-expr: func_call | expr ASS expr1 | expr1;
+expr: expr (ASS | EQ) expr1 | expr1;
 expr1: expr2 APP expr1 | expr2;
 expr2: expr3 OR expr2 | expr3;
 expr3: expr4 AND expr3 | expr4;
@@ -63,16 +66,20 @@ expr7: expr8 (MULT | DIV | MOD) expr7 | expr8;
 expr8: (NOT | MINUS) expr9 | expr9;
 expr9: (INC | DEC) expr10 | expr10;
 expr10: expr10 LB expr RB | expr11;
-expr11: LP expr RP | ID | literal ;
+expr11: LP expr RP | ID | literal | func_call;
 
-literal: INT | FLOAT | STRING | list;
+literal: INT | FLOAT | STRING | BOOL | list | lambda;
+
+lambda: ARROW LP param1 RP LC RETURN expr SEMI RC (LP input RP)? ;
 
 list: LB input RB | LB RB;
 
 func_call:
      ID LP input RP
     | ID LP RP
-    | METHOD LP CL ID RP;
+    | METHOD LP CL ID RP
+    | ID DOT BUILT_IN LP input RP
+    ;
 
 input: expr COM input
     | expr;
@@ -84,7 +91,14 @@ input: expr COM input
 // The parser rules collectively define the syntax of the language.
 
 // TODO
+BUILT_IN: 'match' | 'push';
 EQ: '=';
+DOT: '.';
+RC: '}';
+ARROW: '->';
+LC: '{';
+PATTERN: 'pattern';
+MID: '\n    |';
 APP: '<<';
 OR: '||';
 AND: '&&';
@@ -104,7 +118,8 @@ INC: '++';
 DEC: '--';
 METHOD: 'method';
 MAIN: 'main';
-ASS: EQ | '+=' | '-=' | '*=' | '\\=' | '%=';
+ASS:  '+=' | '-=' | '*=' | '\\=' | '%=';
+BOOL: 'true' | 'false';
 INT: [1-9][0-9]* | '0';
 FLOAT: INT '.' [0]* INT;
 STRING: '"' ~["]* '"' ;
@@ -128,7 +143,4 @@ RB: ']';
 COM: ',';
 CL: ':';
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
-WS: [ \t\n\r]* -> skip;
-
-
-
+WS: [ \t\n\r]+ -> skip;
