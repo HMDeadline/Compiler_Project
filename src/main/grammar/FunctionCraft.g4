@@ -11,7 +11,7 @@ program: (func | ptrn)* main;
 
 func: DEF name = ID LP param RP {System.out.println("FuncDec: " + $name.text);}func_body END;
 
-ptrn: PATTERN name = ID LP param1 RP {System.out.println("PatternDec " + $name.text);} patrn_line* SEMI;
+ptrn: PATTERN name = ID LP param1 RP {System.out.println("PatternDec: " + $name.text);} patrn_line* SEMI;
 
 patrn_line: MID LP expr RP EQ expr;
 
@@ -31,7 +31,7 @@ param_opt: ID EQ expr COM param_opt
 
 main: DEF MAIN LP RP {System.out.println("MAIN");} func_body END;
 
-func_body: line* (RETURN expr? SEMI {System.out.println("RETRUN");})?;
+func_body: line* (RETURN {System.out.println("RETRUN");} expr? SEMI)?;
 
 line: name = ID EQ expr SEMI {System.out.println("Assignment: " + $name.text);}
     |expr SEMI
@@ -57,21 +57,21 @@ forline: line
     | NEXT IF {System.out.println("Control: NEXT");} condition SEMI;
 
 expr: expr (ASS | EQ) expr1 | expr1;
-expr1: expr2 APP expr1 | expr2;
-expr2: expr3 OR expr2 | expr3;
-expr3: expr4 AND expr3 | expr4;
-expr4: expr5 (EQL | NEQL) expr4 | expr5;
-expr5: expr6 (LEQ | GEQ | LE | GE) expr5 | expr6;
-expr6: expr7 (PLUS | MINUS) expr6 | expr7;
-expr7: expr8 (MULT | DIV | MOD) expr7 | expr8;
-expr8: (NOT | MINUS) expr9 | expr9;
-expr9: (INC | DEC) expr10 | expr10;
+expr1: expr2 name = APP expr1 {System.out.println("Operator: " + $name.text);} | expr2;
+expr2: expr3 name = OR expr2 {System.out.println("Operator: " + $name.text);} | expr3;
+expr3: expr4 name = AND expr3 {System.out.println("Operator: " + $name.text);} | expr4;
+expr4: expr5 name = (EQL | NEQL) expr4 {System.out.println("Operator: " + $name.text);} | expr5;
+expr5: expr6 name = (LEQ | GEQ | LE | GE) expr5 {System.out.println("Operator: " + $name.text);} | expr6;
+expr6: expr7 name = (PLUS | MINUS) expr6 {System.out.println("Operator: " + $name.text);} | expr7;
+expr7: expr8 name = (MULT | DIV | MOD) expr7 {System.out.println("Operator: " + $name.text);} | expr8;
+expr8: name = (NOT | MINUS) expr9 {System.out.println("Operator: " + $name.text);} | expr9;
+expr9: name = (INC | DEC) expr10 {System.out.println("Operator: " + $name.text);} | expr10;
 expr10: expr10 LB expr RB | expr11;
 expr11: LP expr RP | ID | literal | func_call;
 
 literal: INT | FLOAT | STRING | BOOL | list | lambda;
 
-lambda: ARROW LP param1 RP LC RETURN expr SEMI RC (LP input RP)? {System.out.println("Structure: LAMBDA");} ;
+lambda: ARROW {System.out.println("Structure: LAMBDA");} LP param1 RP LC RETURN {System.out.println("RETURN");} expr SEMI RC (LP input RP)?;
 
 list: LB input RB | LB RB;
 
@@ -145,4 +145,7 @@ COM: ',';
 CL: ':';
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 WS: [ \t]+ -> skip;
-NL: [\n\r]+ ->skip;
+NL: [\n\r]+ -> skip;
+COMMENT: '#' ~[\n]* -> skip;
+ANY: .;
+COMM: '=begin' ANY* '=end' -> skip;
