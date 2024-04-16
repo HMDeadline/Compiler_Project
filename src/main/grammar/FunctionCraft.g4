@@ -9,9 +9,9 @@ grammar FunctionCraft;
 
 program: (func | ptrn)* main;
 
-func: DEF ID LP param RP func_body END;
+func: DEF name = ID LP param RP {System.out.println("FuncDec: " + $name.text);}func_body END;
 
-ptrn: PATTERN ID LP param1 RP patrn_line* SEMI;
+ptrn: PATTERN name = ID LP param1 RP {System.out.println("PatternDec " + $name.text);} patrn_line* SEMI;
 
 patrn_line: MID LP expr RP EQ expr;
 
@@ -31,29 +31,30 @@ param_opt: ID EQ expr COM param_opt
 
 main: DEF MAIN LP RP {System.out.println("MAIN");} func_body END;
 
-func_body: line* (RETURN expr? SEMI)?;
+func_body: line* (RETURN expr? SEMI {System.out.println("RETRUN");})?;
 
-line: expr SEMI
+line: name = ID EQ expr SEMI {System.out.println("Assignment: " + $name.text);}
+    |expr SEMI
     | if
     | for
     | loop
     ;
 
-if: IF condition line+ (ELSEIF condition line+)* (ELSE line+)? END;
+if: IF {System.out.println("Decision: IF");} condition line+ (ELSEIF {System.out.println("Decision: ELSE IF");} condition line+)* (ELSE {System.out.println("Decision: ELSE");} line+)? END;
 
 condition: LP expr RP;
 
-for: FOR ID IN (ID | range) forline+ END;
+for: FOR {System.out.println("Loop: FOR");} ID IN (ID | range) forline+ END;
 
 range: LP (INT | ID) DD (INT | ID) RP;
 
-loop: LOOPDO forline+ END;
+loop: LOOPDO {System.out.println("Loop: DO");} forline+ END;
 
 forline: line
-    | BREAK SEMI
-    | NEXT SEMI
-    | BREAK IF condition SEMI
-    | NEXT IF condition SEMI;
+    | BREAK SEMI {System.out.println("Control: BREAK");}
+    | NEXT SEMI {System.out.println("Control: NEXT");}
+    | BREAK IF {System.out.println("Control: BREAK");} condition SEMI
+    | NEXT IF {System.out.println("Control: NEXT");} condition SEMI;
 
 expr: expr (ASS | EQ) expr1 | expr1;
 expr1: expr2 APP expr1 | expr2;
@@ -70,7 +71,7 @@ expr11: LP expr RP | ID | literal | func_call;
 
 literal: INT | FLOAT | STRING | BOOL | list | lambda;
 
-lambda: ARROW LP param1 RP LC RETURN expr SEMI RC (LP input RP)? ;
+lambda: ARROW LP param1 RP LC RETURN expr SEMI RC (LP input RP)? {System.out.println("Structure: LAMBDA");} ;
 
 list: LB input RB | LB RB;
 
@@ -98,7 +99,7 @@ RC: '}';
 ARROW: '->';
 LC: '{';
 PATTERN: 'pattern';
-MID: '\n    |';
+MID: '    |';
 APP: '<<';
 OR: '||';
 AND: '&&';
@@ -143,4 +144,5 @@ RB: ']';
 COM: ',';
 CL: ':';
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
-WS: [ \t\n\r]+ -> skip;
+WS: [ \t]+ -> skip;
+NL: [\n\r]+ ->skip;
