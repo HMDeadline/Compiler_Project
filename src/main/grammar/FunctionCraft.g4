@@ -47,8 +47,8 @@ forline: line
     ;
 expr: expr (ASS | EQ) expr1 | expr1;
 expr1: expr2 name = APP expr1 {System.out.println("Operator: " + $name.text);} | expr2;
-expr2: LP expr3 name = OR expr2 RP {System.out.println("Operator: " + $name.text);} | expr3;
-expr3: LP expr4 name = AND expr3 RP {System.out.println("Operator: " + $name.text);} | expr4;
+expr2: LP expr3 RP name = OR LP expr2 RP {System.out.println("Operator: " + $name.text);} | expr3;
+expr3: LP expr4 RP name = AND LP expr3 RP {System.out.println("Operator: " + $name.text);} | expr4;
 expr4: expr5 name = (EQL | NEQL) expr4 {System.out.println("Operator: " + $name.text);} | expr5;
 expr5: expr6 name = (LEQ | GEQ | LE | GE) expr5 {System.out.println("Operator: " + $name.text);} | expr6;
 expr6: expr7 name = (PLUS | MINUS) expr6 {System.out.println("Operator: " + $name.text);} | expr7;
