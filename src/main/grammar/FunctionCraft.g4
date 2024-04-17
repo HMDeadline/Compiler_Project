@@ -23,8 +23,7 @@ main: DEF MAIN LP RP {System.out.println("MAIN");} func_body END;
 
 func_body: line* (RETURN {System.out.println("RETRUN");} expr? SEMI)?;
 
-line: name = ID EQ expr SEMI {System.out.println("Assignment: " + $name.text);}
-    |expr SEMI
+line:expr SEMI
     | if
     | for
     | loop
@@ -45,7 +44,7 @@ forline: line
     | BREAK IF {System.out.println("Control: BREAK");} condition SEMI
     | NEXT IF {System.out.println("Control: NEXT");} condition SEMI
     ;
-expr: expr (ASS | EQ) expr1 | expr1;
+expr: name = variable {System.out.println("Assignment: " + $name.text);} (ASS | EQ) expr | expr1;
 expr1: expr2 name = APP expr1 {System.out.println("Operator: " + $name.text);} | expr2;
 expr2: LP expr3 RP name = OR LP expr2 RP {System.out.println("Operator: " + $name.text);} | expr3;
 expr3: LP expr4 RP name = AND LP expr3 RP {System.out.println("Operator: " + $name.text);} | expr4;
@@ -59,6 +58,8 @@ expr10: expr10 LB expr RB | expr11;
 expr11: LP expr RP | ID | literal | func_call;
 
 literal: INT | FLOAT | STRING | BOOL | list | lambda;
+
+variable: ID | ID (LB expr RB)+;
 
 lambda: ARROW {System.out.println("Structure: LAMBDA");} LP param1 RP LC RETURN {System.out.println("RETURN");} expr SEMI RC (LP input RP)?;
 
