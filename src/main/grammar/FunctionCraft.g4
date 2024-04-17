@@ -1,12 +1,5 @@
 grammar FunctionCraft;
 
-// Lexer rules
-// The lexer rules define patterns for recognizing tokens like numbers, booleans, strings,
-// comments, keywords, identifiers, and operators in the input text. These rules are used
-// by the lexer to break the input into a token stream.
-
-// TODO
-
 program: (func | ptrn)* main;
 
 func: DEF name = ID LP param RP {System.out.println("FuncDec: " + $name.text);}func_body END;
@@ -20,15 +13,12 @@ param:
     | LB param_opt RB
     | param1 COM LB param_opt RB
     ;
-
 param1: ID COM param1
     | ID
     ;
-
 param_opt: ID EQ expr COM param_opt
     | ID EQ expr
     ;
-
 main: DEF MAIN LP RP {System.out.println("MAIN");} func_body END;
 
 func_body: line* (RETURN {System.out.println("RETRUN");} expr? SEMI)?;
@@ -39,7 +29,6 @@ line: name = ID EQ expr SEMI {System.out.println("Assignment: " + $name.text);}
     | for
     | loop
     ;
-
 if: IF {System.out.println("Decision: IF");} condition line+ (ELSEIF {System.out.println("Decision: ELSE IF");} condition line+)* (ELSE {System.out.println("Decision: ELSE");} line+)? END;
 
 condition: LP expr RP;
@@ -54,12 +43,12 @@ forline: line
     | BREAK SEMI {System.out.println("Control: BREAK");}
     | NEXT SEMI {System.out.println("Control: NEXT");}
     | BREAK IF {System.out.println("Control: BREAK");} condition SEMI
-    | NEXT IF {System.out.println("Control: NEXT");} condition SEMI;
-
+    | NEXT IF {System.out.println("Control: NEXT");} condition SEMI
+    ;
 expr: expr (ASS | EQ) expr1 | expr1;
 expr1: expr2 name = APP expr1 {System.out.println("Operator: " + $name.text);} | expr2;
-expr2: expr3 name = OR expr2 {System.out.println("Operator: " + $name.text);} | expr3;
-expr3: expr4 name = AND expr3 {System.out.println("Operator: " + $name.text);} | expr4;
+expr2: LP expr3 name = OR expr2 RP {System.out.println("Operator: " + $name.text);} | expr3;
+expr3: LP expr4 name = AND expr3 RP {System.out.println("Operator: " + $name.text);} | expr4;
 expr4: expr5 name = (EQL | NEQL) expr4 {System.out.println("Operator: " + $name.text);} | expr5;
 expr5: expr6 name = (LEQ | GEQ | LE | GE) expr5 {System.out.println("Operator: " + $name.text);} | expr6;
 expr6: expr7 name = (PLUS | MINUS) expr6 {System.out.println("Operator: " + $name.text);} | expr7;
@@ -82,17 +71,9 @@ func_call:
     | METHOD LP CL ID RP
     | ID DOT name = BUILT_IN {System.out.println("Built-In: " + $name.text.toUpperCase());} LP input RP
     ;
-
 input: expr COM input
-    | expr;
-
-// Parser rules
-// The parser rules start with the program rule, which defines the overall structure of a
-// valid program. They then specify how tokens can be combined to form declarations, control
-// structures, expressions, assignments, function calls, and other constructs within a program.
-// The parser rules collectively define the syntax of the language.
-
-// TODO
+    | expr
+    ;
 BUILT_IN: 'match' | 'push';
 BUILT_IN_FUNCTIONS: 'puts' | 'len' | 'chomp' | 'chop';
 EQ: '=';
