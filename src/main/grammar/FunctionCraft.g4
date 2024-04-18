@@ -44,7 +44,7 @@ forline: line
     | BREAK IF {System.out.println("Control: BREAK");} condition SEMI
     | NEXT IF {System.out.println("Control: NEXT");} condition SEMI
     ;
-expr: name = variable {System.out.println("Assignment: " + $name.text);} (ASS | EQ) expr | expr1;
+expr: name = variable (ASS | EQ) expr {System.out.println("Assignment: " + $name.text);} | expr1;
 expr1: expr1 name = APP expr2 {System.out.println("Operator: " + $name.text);} | expr2;
 expr2: LP expr2 RP name = OR LP expr3 RP {System.out.println("Operator: " + $name.text);} | expr3;
 expr3: LP expr3 RP name = AND LP expr4 RP {System.out.println("Operator: " + $name.text);} | expr4;
